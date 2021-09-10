@@ -71,5 +71,24 @@ elif app_mode == "Make Predictions":
                 result = "NORMAL"
             else:
                 result = "TUBERCULOSIS"
+
             
-    # TODO : implemnet ui for result
+            grid_1,grid_2 = st.columns([1,1])
+            
+            with grid_1:
+                st.markdown ("<h1 class='color-heading' >Prediction</h1>",unsafe_allow_html=True)
+            
+            with grid_2:
+                st.markdown("<h1 class='color-heading'>Metrics</h1> ", unsafe_allow_html=True )
+            
+            grid_res1,grid_res2 = st.columns ([1,1])
+
+            with grid_res1:
+                st.markdown(result)
+            
+            with grid_res2:
+                st.table({
+                    "Pneumonia":pneumonia,
+                    "tuberculosis":tuberculosis,
+                    "normal":normal
+                })
