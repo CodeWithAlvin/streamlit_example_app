@@ -3,6 +3,10 @@ import numpy as np
 import cv2
 from PIL import Image
 
+#adding custom css
+with open("app.css","rb") as css:
+    st.markdown(css,unsafe_allow_html=True)
+
 # design and style for the navbar
 st.markdown(
     """
