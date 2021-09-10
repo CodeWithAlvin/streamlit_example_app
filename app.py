@@ -1,11 +1,19 @@
 import streamlit as st
 import numpy as np
-import cv2
+import pandas as pd
+from backend import load_model,predict
 from PIL import Image
+import matplotlib.pyplot as plt
+
+# LOADING MODEL
+model_path = 'model_densenet_efnet_vgg_09581.h5'
+
+model = load_model(model_path)
+
 
 #adding custom css
-with open("app.css","rb") as css:
-    st.markdown(css,unsafe_allow_html=True)
+with open("src/css/app.css","r") as css:
+    st.markdown("""<style>{}</style>""".format(css.read()),unsafe_allow_html=True)
 
 # design and style for the navbar
 st.markdown(
@@ -22,7 +30,7 @@ st.markdown(
     """,unsafe_allow_html=True
 )
 
-st.sidebar.image("about.jpg",width=64)
+st.sidebar.image("src/img/about.jpg",width=64)
 st.sidebar.title("ML for Health")# setting title on navbar
 
 # defining available app mode 
@@ -31,17 +39,16 @@ app_mode = st.sidebar.selectbox(
     ["Make Predictions","About App"]
 )
 
-
 # desigining about section
 if app_mode == "About App":
-    col1, mid, col2 = st.columns([1.5, 1, 1.5])
+    _, mid, _ = st.columns([1.5, 1, 1.5])
     with mid:
         st.title('About Me')
 
-    col3, mid2, col4 = st.columns([1, 1, 1])
+    _, mid2, _ = st.columns([1, 1, 1])
     with mid2:
         st.markdown("<br/><br/>",unsafe_allow_html=True)
-        st.image("about.jpg",width=200)
+        st.image("src/img/about.jpg",width=200)
         st.markdown("<br/><br/>",unsafe_allow_html=True)
     
     
@@ -61,12 +68,15 @@ elif app_mode == "Make Predictions":
 
     if img_file_buffer is not None:
         image = np.array(Image.open(img_file_buffer))
-        st.image(image)
-        
-        if st.button('Predict Result'):
+        _, img_grid, _ = st.columns([0.2,1,0.2])
+        with img_grid:
+            st.image(image,width=500)
+            btn = st.button('Predict Result')
 
+        if btn:
+            st.markdown("---")
             # call the function here
-            normal,pneumonia,tuberculosis = 0.5, 0.3, 0.2
+            normal,pneumonia,tuberculosis = predict(image, model)
             result = None
 
             if pneumonia > normal and pneumonia > tuberculosis:
@@ -78,21 +88,31 @@ elif app_mode == "Make Predictions":
 
             
             grid_1,grid_2 = st.columns([1,1])
-            
+        
             with grid_1:
-                st.markdown ("<h1 class='color-heading' >Prediction</h1>",unsafe_allow_html=True)
+                st.markdown ("<h1 class='color-heading' >Metrics</h1>",unsafe_allow_html=True)
             
             with grid_2:
-                st.markdown("<h1 class='color-heading'>Metrics</h1> ", unsafe_allow_html=True )
+                st.markdown("<h1 class='color-heading'>Prediction</h1> ", unsafe_allow_html=True )
             
             grid_res1,grid_res2 = st.columns ([1,1])
 
             with grid_res1:
-                st.markdown(result)
+                metrics = pd.DataFrame(
+                    [["Pneumonia",pneumonia],
+                    ["tuberculosis",tuberculosis],
+                    ["normal",normal]]
+                ,columns=['disease','accuracy'])
+                
+                st.table(metrics)
             
             with grid_res2:
-                st.table({
-                    "Pneumonia":pneumonia,
-                    "tuberculosis":tuberculosis,
-                    "normal":normal
-                })
+                st.markdown(f"## {result}")
+
+            st.markdown("---")
+            fig1, ax1 = plt.subplots()
+            ax1.pie(metrics["accuracy"],labels=metrics["disease"], autopct='%1.1f%%',
+                            shadow=True, startangle=90)
+            ax1.axis('equal')   
+            st.pyplot(fig1)
+            
