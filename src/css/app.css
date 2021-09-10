@@ -1,6 +1,9 @@
-.html{
-    overflow: hidden;
-}
 .color-heading{
     color:#f11644;
+}
+
+@media only screen and (max-width: 640px){
+    .block-container{
+        overflow-x: hidden ;
+    }
 }
