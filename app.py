@@ -21,32 +21,6 @@ st.markdown(
 st.sidebar.image("about.jpg",width=64)
 st.sidebar.title("ML for Health")# setting title on navbar
 
-@st.cache()
-def image_resize(img,width=None,height=None):
-    """
-    stroing the height and width of old image 
-    then adjusting aspect ratio 
-    resizing image
-    returning image
-    """
-    dim = None 
-    h,w = img.shape[:2]
-
-    if height is None and width is None:
-        return img
-    
-    elif width is None:
-        ratio = width/float(w)
-        dim = (int(w*ratio),height)
-    
-    else:
-        ratio = height/float(h)
-        dim = (width,int(h*ratio))
-
-    img = cv2.resize(img,dim,interpolation=cv2.INTER_AREA)
-    
-    return img
-     
 # defining available app mode 
 app_mode = st.sidebar.selectbox(
     "",
