@@ -3,14 +3,12 @@ import numpy as np
 import tensorflow as tf
 
 def load_model(path):
-    return None
     # loading the model
     model = tf.keras.models.load_model(path, compile=False)
     return model
 
 
 def predict(image,model):
-    return [0.22,0.65,0.13]
     # model allowable image dimensions
     img_width, img_height = 224, 224
     # loading the image
