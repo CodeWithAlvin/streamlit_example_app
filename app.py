@@ -9,7 +9,12 @@ import text
 
 # LOADING MODEL
 model_path = 'src/model/model.h5'
-model = load_model(model_path)
+
+# Example of using custom layers copy custom layer code in customobj.py import them and used as mentioned below
+# from customobj import FixedDropout
+# custom_objects={"FixedDropout",FixedDropout}
+# model = load_model(model_path,custom_objects=custom_objects)
+model = load_model(model_path,custom_objects=None)
 
 
 #adding custom css
@@ -94,16 +99,7 @@ elif app_mode == "Make Predictions":
 
         st.markdown("---")
         # call the function here
-        normal,pneumonia,tuberculosis = predict(image, model)
-        result = None
-
-        # checking which have greater probablity greater 
-        if pneumonia > normal and pneumonia > tuberculosis:
-            result = "PNEUMONIA"
-        elif normal > pneumonia  and normal > tuberculosis:
-            result = "NORMAL"
-        else:
-            result = "TUBERCULOSIS"
+        result,metrics = predict(image, model)
 
         # columns for showing metrics and results 
         grid_1, _, grid_2 = st.columns([1,0.2,1])
@@ -113,17 +109,11 @@ elif app_mode == "Make Predictions":
             
         with grid_2:
             st.markdown("<h1 class='color-heading'>Prediction</h1> ", unsafe_allow_html=True )
-            
+        
         grid_res1, _, grid_res2 = st.columns ([1,0.2,1])
 
+        # showing metrics
         with grid_res1:
-            # making Dataframe from data recived from model to show
-            metrics = pd.DataFrame(
-                [["Pneumonia",pneumonia],
-                ["tuberculosis",tuberculosis],
-                ["normal",normal]]
-                ,columns=['disease','accuracy'])
-                
             st.table(metrics)
             
         # showing the result 
